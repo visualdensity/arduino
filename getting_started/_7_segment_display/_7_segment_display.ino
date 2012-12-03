@@ -18,18 +18,22 @@ const int C = 2;
 const int E = 4;
 const int F = 5;
 const int G = 6;
+const int TEST=7;
 
 void setup()
 {
   //Setup our pins
-  pinMode(F, OUTPUT);
+  pinMode(TEST, OUTPUT);
   Serial.begin(9600);  //Begin serial communcation
 
 }
 
 void loop()
 {
-  Serial.println("Starting\n");
-  digitalWrite(F, 0);
-  delay(100);
+  Serial.print("Pinging ");
+  Serial.println(TEST);
+  digitalWrite(TEST, HIGH);
+  delay(500);
+  digitalWrite(TEST, LOW);
+  delay(500);
 }
