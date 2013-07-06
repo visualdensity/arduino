@@ -53,8 +53,8 @@ void loop() {
     
     if( duration < 850 ) {
         int pos = map(duration, 1,850,1,180);
-         servo.write(pos);
-         
+        servo.write(pos);
+        delay(100);
     }
     
     delay(250);
