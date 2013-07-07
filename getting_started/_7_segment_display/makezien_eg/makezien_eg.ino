@@ -7,6 +7,7 @@ Make Projects: How to Drive a 7 Segment LED
  I will show you how to use an dedicated IC using SPI or a Shift Register.  Enjoy.
  
  
+ Note: This is a common anode 7-segment
  digitalWrite(A, HIGH) = turn off the "A" segment in the LED display
  digitalWrite(B, LOW)  = turn on the "B" segment in the LED display
  
@@ -113,12 +114,12 @@ void one()
 {
   //Displays 1
   digitalWrite(D, HIGH);
-  digitalWrite(E, LOW);
-  digitalWrite(F, LOW);
+  digitalWrite(E, HIGH);
+  digitalWrite(F, HIGH);
   digitalWrite(G, HIGH);
   digitalWrite(A, HIGH);
-  digitalWrite(B, HIGH);
-  digitalWrite(C, HIGH);
+  digitalWrite(B, LOW);
+  digitalWrite(C, LOW);
 }
 
 void two()
@@ -126,8 +127,8 @@ void two()
   //Displays 2
   digitalWrite(D, LOW);
   digitalWrite(E, LOW);
-  digitalWrite(F, HIGH);
-  digitalWrite(G, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, HIGH);
   digitalWrite(A, LOW);
   digitalWrite(B, LOW);
   digitalWrite(C, HIGH);
@@ -138,8 +139,8 @@ void three()
   //Displays 3
   digitalWrite(D, LOW);
   digitalWrite(E, HIGH);
-  digitalWrite(F, HIGH);
-  digitalWrite(G, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, HIGH);
   digitalWrite(A, LOW);
   digitalWrite(B, LOW);
   digitalWrite(C, LOW);
@@ -222,8 +223,8 @@ void zero()
   //Displays 0
   digitalWrite(D, LOW);
   digitalWrite(E, LOW);
-  digitalWrite(F, LOW);
-  digitalWrite(G, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, LOW);
   digitalWrite(A, LOW);
   digitalWrite(B, LOW);
   digitalWrite(C, LOW);
