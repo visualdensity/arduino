@@ -65,8 +65,8 @@ void char_C()
   //Displays C
   digitalWrite(D, LOW);
   digitalWrite(E, LOW);
-  digitalWrite(F, LOW);
-  digitalWrite(G, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, LOW);
   digitalWrite(A, LOW);
   digitalWrite(B, HIGH);
   digitalWrite(C, HIGH);
@@ -77,8 +77,8 @@ void char_D()
   //Displays D
   digitalWrite(D, LOW);
   digitalWrite(E, LOW);
-  digitalWrite(F, HIGH);
-  digitalWrite(G, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, HIGH);
   digitalWrite(A, HIGH);
   digitalWrite(B, LOW);
   digitalWrite(C, LOW);
