@@ -30,11 +30,11 @@
 #include "RCSwitch.h"
 
 #if not defined( RCSwitchDisableReceiving )
-unsigned long RCSwitch::nReceivedValue = NULL;
-unsigned int RCSwitch::nReceivedBitlength = 0;
-unsigned int RCSwitch::nReceivedDelay = 0;
-unsigned int RCSwitch::nReceivedProtocol = 0;
-int RCSwitch::nReceiveTolerance = 60;
+    unsigned long RCSwitch::nReceivedValue = NULL;
+    unsigned int RCSwitch::nReceivedBitlength = 0;
+    unsigned int RCSwitch::nReceivedDelay = 0;
+    unsigned int RCSwitch::nReceivedProtocol = 0;
+    int RCSwitch::nReceiveTolerance = 60;
 #endif
 unsigned int RCSwitch::timings[RCSWITCH_MAX_CHANGES];
 
@@ -44,9 +44,9 @@ RCSwitch::RCSwitch() {
   this->setRepeatTransmit(10);
   this->setProtocol(1);
   #if not defined( RCSwitchDisableReceiving )
-  this->nReceiverInterrupt = -1;
-  this->setReceiveTolerance(60);
-  RCSwitch::nReceivedValue = NULL;
+    this->nReceiverInterrupt = -1;
+    this->setReceiveTolerance(60);
+    RCSwitch::nReceivedValue = NULL;
   #endif
 }
 
@@ -477,10 +477,10 @@ void RCSwitch::transmit(int nHighPulses, int nLowPulses) {
     #endif
     if (this->nTransmitterPin != -1) {
         #if not defined( RCSwitchDisableReceiving )
-        if (this->nReceiverInterrupt != -1) {
-            this->disableReceive();
-            disabled_Receive = true;
-        }
+            if (this->nReceiverInterrupt != -1) {
+                this->disableReceive();
+                disabled_Receive = true;
+            }
         #endif
         digitalWrite(this->nTransmitterPin, HIGH);
         delayMicroseconds( this->nPulseLength * nHighPulses);
@@ -488,9 +488,9 @@ void RCSwitch::transmit(int nHighPulses, int nLowPulses) {
         delayMicroseconds( this->nPulseLength * nLowPulses);
         
         #if not defined( RCSwitchDisableReceiving )
-        if(disabled_Receive){
-            this->enableReceive(nReceiverInterrupt_backup);
-        }
+            if(disabled_Receive){
+                this->enableReceive(nReceiverInterrupt_backup);
+            }
         #endif
     }
 }
@@ -584,238 +584,237 @@ void RCSwitch::sendSync() {
 }
 
 #if not defined( RCSwitchDisableReceiving )
-/**
- * Enable receiving data
- */
-void RCSwitch::enableReceive(int interrupt) {
-  this->nReceiverInterrupt = interrupt;
-  this->enableReceive();
-}
+    /**
+    * Enable receiving data
+    */
+    void RCSwitch::enableReceive(int interrupt) {
+    this->nReceiverInterrupt = interrupt;
+    this->enableReceive();
+    }
 
-void RCSwitch::enableReceive() {
-  if (this->nReceiverInterrupt != -1) {
+    void RCSwitch::enableReceive() {
+    if (this->nReceiverInterrupt != -1) {
+        RCSwitch::nReceivedValue = NULL;
+        RCSwitch::nReceivedBitlength = NULL;
+        attachInterrupt(this->nReceiverInterrupt, handleInterrupt, CHANGE);
+    }
+    }
+
+    /**
+    * Disable receiving data
+    */
+    void RCSwitch::disableReceive() {
+    detachInterrupt(this->nReceiverInterrupt);
+    this->nReceiverInterrupt = -1;
+    }
+
+    bool RCSwitch::available() {
+    return RCSwitch::nReceivedValue != NULL;
+    }
+
+    void RCSwitch::resetAvailable() {
     RCSwitch::nReceivedValue = NULL;
-    RCSwitch::nReceivedBitlength = NULL;
-    attachInterrupt(this->nReceiverInterrupt, handleInterrupt, CHANGE);
-  }
-}
-
-/**
- * Disable receiving data
- */
-void RCSwitch::disableReceive() {
-  detachInterrupt(this->nReceiverInterrupt);
-  this->nReceiverInterrupt = -1;
-}
-
-bool RCSwitch::available() {
-  return RCSwitch::nReceivedValue != NULL;
-}
-
-void RCSwitch::resetAvailable() {
-  RCSwitch::nReceivedValue = NULL;
-}
-
-unsigned long RCSwitch::getReceivedValue() {
-    return RCSwitch::nReceivedValue;
-}
-
-unsigned int RCSwitch::getReceivedBitlength() {
-  return RCSwitch::nReceivedBitlength;
-}
-
-unsigned int RCSwitch::getReceivedDelay() {
-  return RCSwitch::nReceivedDelay;
-}
-
-unsigned int RCSwitch::getReceivedProtocol() {
-  return RCSwitch::nReceivedProtocol;
-}
-
-unsigned int* RCSwitch::getReceivedRawdata() {
-    return RCSwitch::timings;
-}
-
-/**
- *
- */
-bool RCSwitch::receiveProtocol1(unsigned int changeCount){
-    
-      unsigned long code = 0;
-      unsigned long delay = RCSwitch::timings[0] / 31;
-      unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
-
-      for (int i = 1; i<changeCount ; i=i+2) {
-      
-          if (RCSwitch::timings[i] > delay-delayTolerance && RCSwitch::timings[i] < delay+delayTolerance && RCSwitch::timings[i+1] > delay*3-delayTolerance && RCSwitch::timings[i+1] < delay*3+delayTolerance) {
-            code = code << 1;
-          } else if (RCSwitch::timings[i] > delay*3-delayTolerance && RCSwitch::timings[i] < delay*3+delayTolerance && RCSwitch::timings[i+1] > delay-delayTolerance && RCSwitch::timings[i+1] < delay+delayTolerance) {
-            code+=1;
-            code = code << 1;
-          } else {
-            // Failed
-            i = changeCount;
-            code = 0;
-          }
-      }      
-      code = code >> 1;
-    if (changeCount > 6) {    // ignore < 4bit values as there are no devices sending 4bit values => noise
-      RCSwitch::nReceivedValue = code;
-      RCSwitch::nReceivedBitlength = changeCount / 2;
-      RCSwitch::nReceivedDelay = delay;
-      RCSwitch::nReceivedProtocol = 1;
     }
 
-    if (code == 0){
-        return false;
-    }else if (code != 0){
-        return true;
-    }
-    
-
-}
-
-bool RCSwitch::receiveProtocol2(unsigned int changeCount){
-    
-      unsigned long code = 0;
-      unsigned long delay = RCSwitch::timings[0] / 10;
-      unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
-
-      for (int i = 1; i<changeCount ; i=i+2) {
-      
-          if (RCSwitch::timings[i] > delay-delayTolerance && RCSwitch::timings[i] < delay+delayTolerance && RCSwitch::timings[i+1] > delay*2-delayTolerance && RCSwitch::timings[i+1] < delay*2+delayTolerance) {
-            code = code << 1;
-          } else if (RCSwitch::timings[i] > delay*2-delayTolerance && RCSwitch::timings[i] < delay*2+delayTolerance && RCSwitch::timings[i+1] > delay-delayTolerance && RCSwitch::timings[i+1] < delay+delayTolerance) {
-            code+=1;
-            code = code << 1;
-          } else {
-            // Failed
-            i = changeCount;
-            code = 0;
-          }
-      }      
-      code = code >> 1;
-    if (changeCount > 6) {    // ignore < 4bit values as there are no devices sending 4bit values => noise
-      RCSwitch::nReceivedValue = code;
-      RCSwitch::nReceivedBitlength = changeCount / 2;
-      RCSwitch::nReceivedDelay = delay;
-      RCSwitch::nReceivedProtocol = 2;
+    unsigned long RCSwitch::getReceivedValue() {
+        return RCSwitch::nReceivedValue;
     }
 
-    if (code == 0){
-        return false;
-    }else if (code != 0){
-        return true;
+    unsigned int RCSwitch::getReceivedBitlength() {
+    return RCSwitch::nReceivedBitlength;
     }
 
-}
+    unsigned int RCSwitch::getReceivedDelay() {
+    return RCSwitch::nReceivedDelay;
+    }
 
-/** Protocol 3 is used by BL35P02.
- *
- */
-bool RCSwitch::receiveProtocol3(unsigned int changeCount){
-    
-      unsigned long code = 0;
-      unsigned long delay = RCSwitch::timings[0] / PROTOCOL3_SYNC_FACTOR;
-      unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
+    unsigned int RCSwitch::getReceivedProtocol() {
+    return RCSwitch::nReceivedProtocol;
+    }
 
-      for (int i = 1; i<changeCount ; i=i+2) {
-      
-          if  (RCSwitch::timings[i]   > delay*PROTOCOL3_0_HIGH_CYCLES - delayTolerance
-            && RCSwitch::timings[i]   < delay*PROTOCOL3_0_HIGH_CYCLES + delayTolerance
-            && RCSwitch::timings[i+1] > delay*PROTOCOL3_0_LOW_CYCLES  - delayTolerance
-            && RCSwitch::timings[i+1] < delay*PROTOCOL3_0_LOW_CYCLES  + delayTolerance) {
-            code = code << 1;
-          } else if (RCSwitch::timings[i]   > delay*PROTOCOL3_1_HIGH_CYCLES - delayTolerance
-                  && RCSwitch::timings[i]   < delay*PROTOCOL3_1_HIGH_CYCLES + delayTolerance
-                  && RCSwitch::timings[i+1] > delay*PROTOCOL3_1_LOW_CYCLES  - delayTolerance
-                  && RCSwitch::timings[i+1] < delay*PROTOCOL3_1_LOW_CYCLES  + delayTolerance) {
-            code+=1;
-            code = code << 1;
-          } else {
-            // Failed
-            i = changeCount;
-            code = 0;
-          }
-      }      
-      code = code >> 1;
-      if (changeCount > 6) {    // ignore < 4bit values as there are no devices sending 4bit values => noise
+    unsigned int* RCSwitch::getReceivedRawdata() {
+        return RCSwitch::timings;
+    }
+
+    /**
+    *
+    */
+    bool RCSwitch::receiveProtocol1(unsigned int changeCount){
+        
+        unsigned long code = 0;
+        unsigned long delay = RCSwitch::timings[0] / 31;
+        unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
+
+        for (int i = 1; i<changeCount ; i=i+2) {
+        
+            if (RCSwitch::timings[i] > delay-delayTolerance && RCSwitch::timings[i] < delay+delayTolerance && RCSwitch::timings[i+1] > delay*3-delayTolerance && RCSwitch::timings[i+1] < delay*3+delayTolerance) {
+                code = code << 1;
+            } else if (RCSwitch::timings[i] > delay*3-delayTolerance && RCSwitch::timings[i] < delay*3+delayTolerance && RCSwitch::timings[i+1] > delay-delayTolerance && RCSwitch::timings[i+1] < delay+delayTolerance) {
+                code+=1;
+                code = code << 1;
+            } else {
+                // Failed
+                i = changeCount;
+                code = 0;
+            }
+        }      
+        code = code >> 1;
+        if (changeCount > 6) {    // ignore < 4bit values as there are no devices sending 4bit values => noise
         RCSwitch::nReceivedValue = code;
         RCSwitch::nReceivedBitlength = changeCount / 2;
         RCSwitch::nReceivedDelay = delay;
-        RCSwitch::nReceivedProtocol = 3;
-      }
-
-      if (code == 0){
-        return false;
-      }else if (code != 0){
-        return true;
-      }
-}
-
-void RCSwitch::handleInterrupt() {
-
-  static unsigned int duration;
-  static unsigned int changeCount;
-  static unsigned long lastTime;
-  static unsigned int repeatCount;
-  
-
-  long time = micros();
-  duration = time - lastTime;
- 
-  if (duration > 5000 && duration > RCSwitch::timings[0] - 200 && duration < RCSwitch::timings[0] + 200) {
-    repeatCount++;
-    changeCount--;
-    if (repeatCount == 2) {
-      if (receiveProtocol1(changeCount) == false){
-        if (receiveProtocol2(changeCount) == false){
-          if (receiveProtocol3(changeCount) == false){
-            //failed
-          }
+        RCSwitch::nReceivedProtocol = 1;
         }
-      }
-      repeatCount = 0;
+
+        if (code == 0){
+            return false;
+        }else if (code != 0){
+            return true;
+        }
+        
+
     }
-    changeCount = 0;
-  } else if (duration > 5000) {
-    changeCount = 0;
-  }
- 
-  if (changeCount >= RCSWITCH_MAX_CHANGES) {
-    changeCount = 0;
-    repeatCount = 0;
-  }
-  RCSwitch::timings[changeCount++] = duration;
-  lastTime = time;  
-}
 
-/**
-  * Turns a decimal value to its binary representation
-  */
-char* RCSwitch::dec2binWzerofill(unsigned long Dec, unsigned int bitLength){
-    return dec2binWcharfill(Dec, bitLength, '0');
-}
+    bool RCSwitch::receiveProtocol2(unsigned int changeCount){
+        
+        unsigned long code = 0;
+        unsigned long delay = RCSwitch::timings[0] / 10;
+        unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
 
-char* RCSwitch::dec2binWcharfill(unsigned long Dec, unsigned int bitLength, char fill){
-  static char bin[64];
-  unsigned int i=0;
+        for (int i = 1; i<changeCount ; i=i+2) {
+        
+            if (RCSwitch::timings[i] > delay-delayTolerance && RCSwitch::timings[i] < delay+delayTolerance && RCSwitch::timings[i+1] > delay*2-delayTolerance && RCSwitch::timings[i+1] < delay*2+delayTolerance) {
+                code = code << 1;
+            } else if (RCSwitch::timings[i] > delay*2-delayTolerance && RCSwitch::timings[i] < delay*2+delayTolerance && RCSwitch::timings[i+1] > delay-delayTolerance && RCSwitch::timings[i+1] < delay+delayTolerance) {
+                code+=1;
+                code = code << 1;
+            } else {
+                // Failed
+                i = changeCount;
+                code = 0;
+            }
+        }      
+        code = code >> 1;
+        if (changeCount > 6) {    // ignore < 4bit values as there are no devices sending 4bit values => noise
+        RCSwitch::nReceivedValue = code;
+        RCSwitch::nReceivedBitlength = changeCount / 2;
+        RCSwitch::nReceivedDelay = delay;
+        RCSwitch::nReceivedProtocol = 2;
+        }
 
-  while (Dec > 0) {
-    bin[32+i++] = ((Dec & 1) > 0) ? '1' : fill;
-    Dec = Dec >> 1;
-  }
+        if (code == 0){
+            return false;
+        }else if (code != 0){
+            return true;
+        }
 
-  for (unsigned int j = 0; j< bitLength; j++) {
-    if (j >= bitLength - i) {
-      bin[j] = bin[ 31 + i - (j - (bitLength - i)) ];
-    }else {
-      bin[j] = fill;
     }
-  }
-  bin[bitLength] = '\0';
-  
-  return bin;
-}
 
+    /** Protocol 3 is used by BL35P02.
+    *
+    */
+    bool RCSwitch::receiveProtocol3(unsigned int changeCount){
+        
+        unsigned long code = 0;
+        unsigned long delay = RCSwitch::timings[0] / PROTOCOL3_SYNC_FACTOR;
+        unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
+
+        for (int i = 1; i<changeCount ; i=i+2) {
+        
+            if  (RCSwitch::timings[i]   > delay*PROTOCOL3_0_HIGH_CYCLES - delayTolerance
+                && RCSwitch::timings[i]   < delay*PROTOCOL3_0_HIGH_CYCLES + delayTolerance
+                && RCSwitch::timings[i+1] > delay*PROTOCOL3_0_LOW_CYCLES  - delayTolerance
+                && RCSwitch::timings[i+1] < delay*PROTOCOL3_0_LOW_CYCLES  + delayTolerance) {
+                code = code << 1;
+            } else if (RCSwitch::timings[i]   > delay*PROTOCOL3_1_HIGH_CYCLES - delayTolerance
+                    && RCSwitch::timings[i]   < delay*PROTOCOL3_1_HIGH_CYCLES + delayTolerance
+                    && RCSwitch::timings[i+1] > delay*PROTOCOL3_1_LOW_CYCLES  - delayTolerance
+                    && RCSwitch::timings[i+1] < delay*PROTOCOL3_1_LOW_CYCLES  + delayTolerance) {
+                code+=1;
+                code = code << 1;
+            } else {
+                // Failed
+                i = changeCount;
+                code = 0;
+            }
+        }      
+        code = code >> 1;
+        if (changeCount > 6) {    // ignore < 4bit values as there are no devices sending 4bit values => noise
+            RCSwitch::nReceivedValue = code;
+            RCSwitch::nReceivedBitlength = changeCount / 2;
+            RCSwitch::nReceivedDelay = delay;
+            RCSwitch::nReceivedProtocol = 3;
+        }
+
+        if (code == 0){
+            return false;
+        }else if (code != 0){
+            return true;
+        }
+    }
+
+    void RCSwitch::handleInterrupt() {
+
+    static unsigned int duration;
+    static unsigned int changeCount;
+    static unsigned long lastTime;
+    static unsigned int repeatCount;
+    
+
+    long time = micros();
+    duration = time - lastTime;
+    
+    if (duration > 5000 && duration > RCSwitch::timings[0] - 200 && duration < RCSwitch::timings[0] + 200) {
+        repeatCount++;
+        changeCount--;
+        if (repeatCount == 2) {
+        if (receiveProtocol1(changeCount) == false){
+            if (receiveProtocol2(changeCount) == false){
+            if (receiveProtocol3(changeCount) == false){
+                //failed
+            }
+            }
+        }
+        repeatCount = 0;
+        }
+        changeCount = 0;
+    } else if (duration > 5000) {
+        changeCount = 0;
+    }
+    
+    if (changeCount >= RCSWITCH_MAX_CHANGES) {
+        changeCount = 0;
+        repeatCount = 0;
+    }
+    RCSwitch::timings[changeCount++] = duration;
+    lastTime = time;  
+    }
+
+    /**
+    * Turns a decimal value to its binary representation
+    */
+    char* RCSwitch::dec2binWzerofill(unsigned long Dec, unsigned int bitLength){
+        return dec2binWcharfill(Dec, bitLength, '0');
+    }
+
+    char* RCSwitch::dec2binWcharfill(unsigned long Dec, unsigned int bitLength, char fill){
+    static char bin[64];
+    unsigned int i=0;
+
+    while (Dec > 0) {
+        bin[32+i++] = ((Dec & 1) > 0) ? '1' : fill;
+        Dec = Dec >> 1;
+    }
+
+    for (unsigned int j = 0; j< bitLength; j++) {
+        if (j >= bitLength - i) {
+        bin[j] = bin[ 31 + i - (j - (bitLength - i)) ];
+        }else {
+        bin[j] = fill;
+        }
+    }
+    bin[bitLength] = '\0';
+    
+    return bin;
+    }
 #endif

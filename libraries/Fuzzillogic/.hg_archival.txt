@@ -1,0 +1,4 @@
+repo: 7fadcc1199adb456f4e6be599e3d29e3a520473d
+node: c5d18d4eaa9fbc66e7b3b232e1886f06320f47fd
+branch: default
+tag: latest_stable
