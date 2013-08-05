@@ -42,6 +42,9 @@ class DuinoDriver
         void left();
         void right();
     private:
+        /* Used thiese 2 vars cause Arduino doesn't 
+         * support vector<map<string, int> >
+         */
         int sideA[3];
         int sideB[3];
 };
