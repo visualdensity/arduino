@@ -76,8 +76,6 @@ class RCSwitch {
     void send(unsigned long Code, unsigned int length);
     void send(char* Code);
 
-    
-
     #if not defined( RCSwitchDisableReceiving )
         void enableReceive(int interrupt);
 

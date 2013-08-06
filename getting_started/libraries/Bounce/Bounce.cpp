@@ -2,9 +2,9 @@
 // Please read Bounce.h for information about the liscence and authors
 
 #if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
+    #include "Arduino.h"
 #else
-#include "WProgram.h"
+    #include "WProgram.h"
 #endif
 #include "Bounce.h"
 
