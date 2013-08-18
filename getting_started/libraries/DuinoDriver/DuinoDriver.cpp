@@ -13,6 +13,8 @@
         } else if( side == SIDE_B ) {
             this->sideB[ENABLE_PIN] = pin;
         } 
+
+        pinMode( pin, OUTPUT);
     }//setEnablePin
 
     void DuinoDriver::setOutputA(int side, int pin)
@@ -22,6 +24,7 @@
         } else if ( side == SIDE_B ) {
             this->sideB[OUTPUT_A] = pin;
         }
+        pinMode( pin, OUTPUT);
     }//setOuputA
 
     void DuinoDriver::setOutputB(int side, int pin)
@@ -31,6 +34,7 @@
         } else if ( side == SIDE_B ) {
             this->sideB[OUTPUT_B] = pin;
         }
+        pinMode( pin, OUTPUT);
     }//setOutputB
 
     void DuinoDriver::setInputA(int side, int pin)
@@ -40,6 +44,7 @@
         } else if ( side == SIDE_B ) {
             this->sideB[INPUT_A] = pin;
         }
+        pinMode( pin, OUTPUT);
     }//setInputA
 
     void DuinoDriver::setInputB(int side, int pin)
@@ -49,8 +54,17 @@
         } else if ( side == SIDE_B ) {
             this->sideB[INPUT_B] = pin;
         }
+        pinMode( pin, OUTPUT);
     }//setInputB
 
+    void DuinoDriver::setMaxSpeed( int maxSpeed )
+    {
+        if( maxSpeed < 256 ) {
+            this->maxSpeed = maxSpeed;
+        } else {
+            this->maxSpeed = 100;
+        }
+    }
 
 /*
  * On/Off
@@ -91,10 +105,10 @@
  */
     void DuinoDriver::forward()
     {
-        digitalWrite(this->sideA[OUTPUT_A], 1);
+        analogWrite(this->sideA[OUTPUT_A], 100);
         digitalWrite(this->sideA[OUTPUT_B], 0);
         
-        digitalWrite(this->sideB[OUTPUT_A], 1);
+        analogWrite(this->sideB[OUTPUT_A], 100);
         digitalWrite(this->sideB[OUTPUT_B], 0);
     }//forward
 

@@ -23,6 +23,7 @@ class DuinoDriver
 {
     public:
         void setEnablePin( int side, int pin );
+        void setMaxSpeed( int maxSpeed );
 
         void setOutputA( int side, int pin );
         void setOutputB( int side, int pin );
@@ -47,6 +48,7 @@ class DuinoDriver
          */
         int sideA[3];
         int sideB[3];
+        int maxSpeed;
 };
 
 #endif
