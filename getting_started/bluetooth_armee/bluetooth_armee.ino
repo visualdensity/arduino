@@ -1,4 +1,3 @@
-#include <DuinoDriver.h>
 #include <PS3BT.h>
 #include <usbhub.h>
 
@@ -12,6 +11,19 @@ boolean printAngle;
 
 int connected = 0;
 
+int enableA = 7;
+int enableB = 2;
+
+int motorA_A = 3;
+int motorA_B = 4;
+
+int motorB_A = 5;
+int motorB_B = 6;
+
+int motor_running = 0;
+
+int mSpeed = 100;
+
 void setup() {
     Serial.begin(115200);
 
@@ -21,6 +33,7 @@ void setup() {
     }
 
     Serial.print(F("\r\nBluetooth Library initiated..."));
+    motorOn();
 }
 
 void loop() {
@@ -52,7 +65,7 @@ void loop() {
                 Serial.print(PS3.getAnalogHat(RightHatX));
                 Serial.print(F("\tRightHatY: ")); 
                 Serial.print(PS3.getAnalogHat(RightHatY));
-            }      
+            }
         }//AnalogHat
 
         //Analog button values can be read from almost all buttons
@@ -77,6 +90,14 @@ void loop() {
 
             if(PS3.getButtonClick(CIRCLE)) {
                 Serial.print(F("\r\nCircle"));
+
+                if( motor_running == 0 ) {
+                    forward();
+                    motor_running = 1;
+                } else {
+                    motorOff();
+                    motor_running = 0;
+                }
             }
 
             if(PS3.getButtonClick(CROSS)) {
@@ -153,5 +174,53 @@ void loop() {
             Serial.print(PS3.getAngle(Roll));
         }
     } 
-
+    
+    delay(150);
 }//loop
+
+void motorOn()
+{
+    analogWrite(enableA, 50);
+    analogWrite(enableB, 50);
+}
+
+void motorOff()
+{
+    digitalWrite(enableA, LOW);
+    digitalWrite(enableB, LOW);
+}
+
+void reverse()
+{
+    digitalWrite(motorA_A, HIGH);
+    digitalWrite(motorB_A, HIGH);
+    
+    digitalWrite(motorA_B, LOW);
+    digitalWrite(motorB_B, LOW);
+}
+
+void forward()
+{
+    digitalWrite(motorA_A, LOW);
+    digitalWrite(motorB_A, LOW);
+    
+    analogWrite(motorA_B, mSpeed);
+    analogWrite(motorB_B, mSpeed);
+}
+
+void left()
+{
+    analogWrite(motorA_A, mSpeed);
+    digitalWrite(motorA_B, LOW);
+    
+    digitalWrite(motorB_A, LOW);
+    analogWrite(motorB_B, mSpeed);
+}
+void right()
+{
+    digitalWrite(motorA_A, LOW);
+    analogWrite(motorA_B, mSpeed);
+    
+    analogWrite(motorB_A, mSpeed);
+    digitalWrite(motorB_B, LOW);
+}

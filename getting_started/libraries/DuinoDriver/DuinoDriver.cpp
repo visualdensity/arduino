@@ -17,26 +17,6 @@
         pinMode( pin, OUTPUT);
     }//setEnablePin
 
-    void DuinoDriver::setOutputA(int side, int pin)
-    {
-        if( side == SIDE_A ) {
-            this->sideA[OUTPUT_A] = pin;
-        } else if ( side == SIDE_B ) {
-            this->sideB[OUTPUT_A] = pin;
-        }
-        pinMode( pin, OUTPUT);
-    }//setOuputA
-
-    void DuinoDriver::setOutputB(int side, int pin)
-    {
-        if( side == SIDE_A ) {
-            this->sideA[OUTPUT_B] = pin;
-        } else if ( side == SIDE_B ) {
-            this->sideB[OUTPUT_B] = pin;
-        }
-        pinMode( pin, OUTPUT);
-    }//setOutputB
-
     void DuinoDriver::setInputA(int side, int pin)
     {
         if( side == SIDE_A ) {

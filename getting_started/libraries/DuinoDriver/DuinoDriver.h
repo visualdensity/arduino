@@ -13,20 +13,14 @@
 
 #define ENABLE_PIN 10
 
-#define OUTPUT_A 11
-#define OUTPUT_B 12
-
-#define INPUT_A 13
-#define INPUT_B 14
+#define INPUT_A 20
+#define INPUT_B 21
 
 class DuinoDriver
 {
     public:
         void setEnablePin( int side, int pin );
         void setMaxSpeed( int maxSpeed );
-
-        void setOutputA( int side, int pin );
-        void setOutputB( int side, int pin );
 
         void setInputA( int side, int pin );
         void setInputB( int side, int pin );
