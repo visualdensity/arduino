@@ -8,27 +8,27 @@
 #ifndef DUINODRIVER_H
 #define DUINODRIVER_H
 
-#define SIDE_A 0
-#define SIDE_B 1
+enum Sides
+{
+    SIDE_A = 0,
+    SIDE_B = 1
+};
 
-#define ENABLE_PIN 10
-
-#define OUTPUT_A 11
-#define OUTPUT_B 12
-
-#define INPUT_A 13
-#define INPUT_B 14
+struct HDriver
+{
+    int enablePin;
+    int inputA;
+    int inputB;
+    int speed;
+};
 
 class DuinoDriver
 {
     public:
-        void setEnablePin( int side, int pin );
+        void DuinoDriver();
 
-        void setOutputA( int side, int pin );
-        void setOutputB( int side, int pin );
-
-        void setInputA( int side, int pin );
-        void setInputB( int side, int pin );
+        void setSideA( HDriver d );
+        void setSideB( HDriver d );
 
         void motorOn ( int side );
         void motorOff( int side );
@@ -42,8 +42,10 @@ class DuinoDriver
         void left();
         void right();
     private:
-        int sideA[3];
-        int sideB[3];
+        int enablePin;
+        HDriver driverConf;
+
+        void setupSide( Side side, HDriver d );
 };
 
 #endif

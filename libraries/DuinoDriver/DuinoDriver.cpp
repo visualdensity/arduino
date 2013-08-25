@@ -6,97 +6,63 @@
 /*
  * Setups and configs
  */
-    void DuinoDriver::setEnablePin( int side, int pin )
+    void DuinoDriver::DuinoDriver()
     {
-        if( side == SIDE_A ) {
-            this->sideA[ENABLE_PIN] = pin;
-        else if( side == SIDE_B ) {
-            this->sideB[ENABLE_PIN] = pin;
-        } else {
-            return false;
-        }
-    }//setEnablePin
+        HDriver driverConf[2];
+    }//construct
 
-    void DuinoDriver::setOutputA(int side, int pin)
+    void DuinoDriver::setSideA( HDriver d ) 
     {
-        if( side == SIDE_A ) {
-            this->sideA[OUTPUT_A] = pin;
-        } else if ( side == SIDE_B ) {
-            this->sideB[OUTPUT_A] = pin;
-        } else {
-            return false;
-        }
-    }//setOuputA
+        this->setupSide( SIDE_A, d );
+    }//setSideA
 
-    void DuinoDriver::setOutputB(int side, int pin)
+    void DuinoDriver::setSideB( HDriver d )
     {
-        if( side == SIDE_A ) {
-            this->sideA[OUTPUT_B] = pin;
-        } else if ( side == SIDE_B ) {
-            this->sideB[OUTPUT_B] = pin;
-        } else {
-            return false;
-        }
-    }//setOutputB
+        this->setupSide( SIDE_B, d );
+    }//setSideB
 
-    void DuinoDriver::setInputA(int side, int pin)
+    void DuinoDriver::setupSide( Sides side, HDriver d )
     {
-        if( side == SIDE_A ) {
-            this->sideA[INPUT_A] = pin;
-        } else if ( side == SIDE_B ) {
-            this->sideB[INPUT_A] = pin;
-        } else {
-            return false;
-        }
-    }//setInputA
+        if( d.inputA && d.inputB && d.speed ) {
 
-    void DuinoDriver::setInputB(int side, int pin)
-    {
-        if( side == SIDE_A ) {
-            this->sideA[INPUT_B] = pin;
-        } else if ( side == SIDE_B ) {
-            this->sideB[INPUT_B] = pin;
-        } else {
-            return false;
-        }
-    }//setInputB
+            this->driverConf[side] = d;
 
+            pinMode( d.enablePin, OUTPUT );
+            pinMode( d.inputA,    OUTPUT );
+            pinMode( d.inputB,    OUTPUT );
+
+        }
+    }//setupSides
 
 /*
  * On/Off
  */
-    void DuinoDriver::motorOff(int side)
+    void DuinoDriver::motorOff( Sides side )
     {
-        if( side == SIDE_A ) {
-            digitalWrite(this->sideA[ENABLE_PIN], 0);
-        } else if ( side == SIDE_B ) {
-            digitalWrite(this->sideB[ENABLE_PIN], 0);
-        } else {
-            return false;
-        }
+        digitalWrite( this->driverConf[side].enablePin, LOW );
     }//motorOff
 
-    void DuinoDriver::motorOn(int side)
+    void DuinoDriver::motorOn( Sides side )
     {
-        if( side == SIDE_A ) {
-            digitalWrite(this->sideA[ENABLE_PIN], 1);
-        } else if ( side == SIDE_B ) {
-            digitalWrite(this->sideB[ENABLE_PIN], 1);
-        } else {
-            return false;
-        }
+        digitalWrite( this->driverConf[side].enablePin, HIGH );
     }//motorOn
 
+    /**
+     * Both motors Off
+     */
     void DuinoDriver::motorsOff()
     {
-        digitalWrite(this->sideA[ENABLE_PIN], 0);
-        digitalWrite(this->sideB[ENABLE_PIN], 0);
+        digitalWrite( this->driverConf[SIDE_A].enablePin, LOW );
+        digitalWrite( this->driverConf[SIDE_B].enablePin, LOW );
     }//motorsOff
 
+    /**
+     * Both motors On
+     */
     void DuinoDriver::motorsOn()
     {
-        digitalWrite(this->sideA[ENABLE_PIN], 1);
-        digitalWrite(this->sideB[ENABLE_PIN], 1);
+        digitalWrite( this->driverConf[SIDE_A].enablePin, HIGH );
+        digitalWrite( this->driverConf[SIDE_B].enablePin, HIGH );
     }//motorsOn
 
 
@@ -105,37 +71,37 @@
  */
     void DuinoDriver::forward()
     {
-        digitalWrite(this->sideA[OUTPUT_A], 1);
-        digitalWrite(this->sideA[OUTPUT_B], 0);
-        
-        digitalWrite(this->sideB[OUTPUT_A], 1);
-        digitalWrite(this->sideB[OUTPUT_B], 0);
+        digitalWrite( this->driverConf[SIDE_A].inputA, HIGH );
+        digitalWrite( this->driverConf[SIDE_A].inputB, LOW  );
+
+        digitalWrite( this->driverConf[SIDE_B].inputA, HIGH );
+        digitalWrite( this->driverConf[SIDE_B].inputB, LOW  );
     }//forward
 
     void DuinoDriver::reverse()
     {
-        digitalWrite(this->sideA[OUTPUT_A], 0);
-        digitalWrite(this->sideA[OUTPUT_B], 1);
-                                          
-        digitalWrite(this->sideB[OUTPUT_A], 0);
-        digitalWrite(this->sideB[OUTPUT_B], 1);
+        digitalWrite( this->driverConf[SIDE_A].inputA, LOW  );
+        digitalWrite( this->driverConf[SIDE_A].inputB, HIGH );
+
+        digitalWrite( this->driverConf[SIDE_B].inputA, LOW  );
+        digitalWrite( this->driverConf[SIDE_B].inputB, HIGH );
     }//reverse
 
     void DuinoDriver::left()
     {
-        digitalWrite(this->sideA[OUTPUT_A], 1);
-        digitalWrite(this->sideA[OUTPUT_B], 0);
-                                          
-        digitalWrite(this->sideB[OUTPUT_A], 0);
-        digitalWrite(this->sideB[OUTPUT_B], 1);
+        digitalWrite( this->driverConf[SIDE_A].inputA, HIGH );
+        digitalWrite( this->driverConf[SIDE_A].inputB, LOW  );
+
+        digitalWrite( this->driverConf[SIDE_B].inputA, LOW  );
+        digitalWrite( this->driverConf[SIDE_B].inputB, HIGH );
     }//left
 
     void DuinoDriver::right()
     {
-        digitalWrite(this->sideA[OUTPUT_A], 0);
-        digitalWrite(this->sideA[OUTPUT_B], 1);
-                                          
-        digitalWrite(this->sideB[OUTPUT_A], 1);
-        digitalWrite(this->sideB[OUTPUT_B], 0);
+        digitalWrite( this->driverConf[SIDE_A].inputA, LOW  );
+        digitalWrite( this->driverConf[SIDE_A].inputB, HIGH );
+
+        digitalWrite( this->driverConf[SIDE_B].inputA, HIGH );
+        digitalWrite( this->driverConf[SIDE_B].inputB, LOW  );
     }//right
 
