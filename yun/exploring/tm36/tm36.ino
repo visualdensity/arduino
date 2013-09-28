@@ -1,9 +1,21 @@
+#include <Bridge.h>
+#include <YunServer.h>
+#include <YunClient.h>
 #include <Process.h>
 
 int sensorPin = A0;
+YunServer server;
 
 void setup() {
+  
+  pinMode(13,OUTPUT);
+  digitalWrite(13, LOW);
+  Bridge.begin();
+  digitalWrite(13, HIGH);
   Bridge.begin();	// Initialize the Bridge
+  server.listenOnLocalhost();
+  server.begin();
+  
   Serial.begin( 9600 );
   
   while(!Serial);

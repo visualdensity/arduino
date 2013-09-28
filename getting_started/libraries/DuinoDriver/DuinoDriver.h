@@ -8,25 +8,28 @@
 #ifndef DUINODRIVER_H
 #define DUINODRIVER_H
 
-#define SIDE_A 0
-#define SIDE_B 1
+enum Sides
+{
+    SIDE_A = 0,
+    SIDE_B = 1
+};
 
-#define ENABLE_PIN 10
-
-#define INPUT_A 20
-#define INPUT_B 21
+struct HDriver
+{
+    int enablePin;
+    int inputA;
+    int inputB;
+    int speed;
+};
 
 class DuinoDriver
 {
     public:
-        void setEnablePin( int side, int pin );
-        void setMaxSpeed( int maxSpeed );
+        void setSideA( HDriver d );
+        void setSideB( HDriver d );
 
-        void setInputA( int side, int pin );
-        void setInputB( int side, int pin );
-
-        void motorOn ( int side );
-        void motorOff( int side );
+        void motorOn ( Sides side );
+        void motorOff( Sides side );
 
         void motorsOn();
         void motorsOff();
@@ -37,12 +40,10 @@ class DuinoDriver
         void left();
         void right();
     private:
-        /* Used thiese 2 vars cause Arduino doesn't 
-         * support vector<map<string, int> >
-         */
-        int sideA[3];
-        int sideB[3];
-        int maxSpeed;
+        int enablePin;
+        HDriver driverConf[2];
+
+        void setupSide( Sides side, HDriver d );
 };
 
 #endif

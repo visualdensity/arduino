@@ -26,9 +26,8 @@
 #include <YunServer.h>
 #include <YunClient.h>
 
-// Listen on default port 5555, the webserver on the Yun
-// will forward there all the HTTP requests for us.
 YunServer server;
+
 int led = 8;
 int light = A4;
 int flashy = 0;
@@ -42,8 +41,6 @@ void setup() {
   Bridge.begin();
   digitalWrite(13, HIGH);
   
-  // Listen for incoming connection only from localhost
-  // (no one from the external network could connect)
   server.listenOnLocalhost();
   server.begin();
 }
