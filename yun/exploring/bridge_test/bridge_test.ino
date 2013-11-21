@@ -1,25 +1,6 @@
 /*
   Arduino Yun Bridge example
- 
- This example for the Arduino Yun shows how to use the 
- Bridge library to access the digital and analog pins 
- on the board through REST calls. It demonstrates how 
- you can create your own API when using REST style 
- calls through the browser.
- 
- Possible commands created in this shetch:
-
- * "/arduino/digital/13"     -> digitalRead(13)
- * "/arduino/digital/13/1"   -> digitalWrite(13, HIGH)
- * "/arduino/analog/2/123"   -> analogWrite(2, 123)
- * "/arduino/analog/2"       -> analogRead(2)
- * "/arduino/mode/13/input"  -> pinMode(13, INPUT)
- * "/arduino/mode/13/output" -> pinMode(13, OUTPUT)
- 
- This example code is part of the public domain
- 
- http://arduino.cc/en/Tutorial/Bridge
-
+  http://arduino.cc/en/Tutorial/Bridge
  */
 
 #include <Bridge.h>
@@ -28,65 +9,71 @@
 
 YunServer server;
 
-int led = 8;
-int light = A4;
+int led   = 13;
+int input = A0;
+
 int flashy = 0;
 
 void setup() {  
-  pinMode( led, OUTPUT );
+   
+    // Bridge startup
+    pinMode(13,OUTPUT);
+    digitalWrite(13, LOW);
+    Bridge.begin();
+    digitalWrite(13, HIGH);
+    
+    server.listenOnLocalhost();
+    server.begin();
+
+    // Get serial output happening
+    Serial.begin(9600);
   
-  // Bridge startup
-  pinMode(13,OUTPUT);
-  digitalWrite(13, LOW);
-  Bridge.begin();
-  digitalWrite(13, HIGH);
-  
-  server.listenOnLocalhost();
-  server.begin();
+    // Wait until a Serial Monitor is connected.
+    //while (!Serial);
+
+    // Other setups
+    pinMode( led, OUTPUT );
 }
 
 void loop() {
-  String subject;
-  int state;
-  int lumens=0;
-  
-  lumens = analogRead( light );
-  
-  // Get clients coming from server
-  YunClient client = server.accept();
 
-  // There is a new client?
-  if (client) {
-    client.print("Light: ");
-    client.println( lumens );
+    int inputReading = analogRead( input );
+    Serial.println( "Input: " + String(inputReading) );
     
-    subject = client.readStringUntil('/');
-    state = client.parseInt();
+    // Get clients coming from server
+    YunClient client = server.accept();
+
+    if (client) {
+        client.print("Input: ");
+        client.println( inputReading );
     
-    if(state == 1) {
-      digitalWrite( led, HIGH );
-      flashy = 0;
-    } else if (state == 2) {
-      flashy = 1;
-    } else {
-      digitalWrite( led, LOW );
-      flashy = 0;
+        String context = client.readStringUntil('/');
+        int state = client.parseInt();
+    
+        if(state == 1) {
+            digitalWrite( led, HIGH );
+            flashy = 0;
+        } else if (state == 2) {
+            flashy = 1;
+        } else {
+            digitalWrite( led, LOW );
+            flashy = 0;
+        }
+        
+        client.print("Context: ");
+        client.println(context);
+        client.print("State: ");
+        client.println(state);
+    
+        client.stop();
     }
-    
-    client.print("Subject ");
-    client.println(subject);
-    client.print("State ");
-    client.println(state);
-    
-    client.stop();
-  }
   
-  if( flashy == 1 ) {
-    digitalWrite( led, HIGH);
-    delay(50);
-    digitalWrite( led, LOW);
-  }
+    if( flashy == 1 ) {
+        digitalWrite( led, HIGH);
+        delay(50);
+        digitalWrite( led, LOW);
+    }
 
-  delay(50); // Poll every 50ms
+    delay(50); // Poll every 50ms
 }
 
