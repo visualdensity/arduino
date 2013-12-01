@@ -47,7 +47,7 @@
             <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4><span class="glyphicon glyphicon-signal"></span> Pot Value</h4>
+                    <h4><span class="glyphicon glyphicon-dashboard"></span> Temperature</h4>
                 </div>
                 <div class="panel-body">
                     <span id="status-block">Loading...</span>
@@ -66,6 +66,8 @@
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
+    var offset = 7.5;
+
     (function poll() {
         setTimeout(function () {
             $.ajax({
@@ -73,7 +75,16 @@
                 dataType: 'text',
                 url: 'http://arduino.local/arduino/status',
                 success: function (data) {
-                    $('#status-block').html( data );
+                    var temp = ( ( data * (5000/1024) ) - 500 )/10;
+                    var rounded_temp = ( Math.round( temp * 100 )/100 ) - 7.5;
+                    var fixed_temp   = temp.toFixed(2) - 7.5;
+
+                    console.log( "Data: " + data );
+                    console.log( "Temp: " + temp );
+                    console.log( "Temp fixed: " + fixed_temp );
+                    console.log( "Temp rounded: " + rounded_temp );
+
+                    $('#status-block').html( rounded_temp + "&deg;C" );
                 },
                 complete: poll
             });
