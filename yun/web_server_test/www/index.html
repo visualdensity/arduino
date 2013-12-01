@@ -21,6 +21,8 @@
             font-size: 38px;
             font-weight: bold;
         }
+        :focus { outline:none; }
+        ::-moz-focus-inner { border:0; }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
   </head>
@@ -34,8 +36,8 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#">Temperature</a></li>
-                    <li><a href="#">Humidity</a></li>
+                    <li><a href="#">On</a></li>
+                    <li><a href="#">Off</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -55,6 +57,19 @@
             </div>
             </div>
 
+
+            <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4><span class="glyphicon glyphicon-flash"></span> LED</h4>
+                </div>
+                <div class="panel-body">
+                    <button id="led-state" type="button" class="btn btn-default">Checking</button>
+                </div>
+            </div>
+            </div>
+
+
         </div>
         <!-- END body -->
 
@@ -70,6 +85,8 @@
 
     (function poll() {
         setTimeout(function () {
+
+            // Temperature
             $.ajax({
                 type: 'GET',
                 dataType: 'text',
@@ -88,8 +105,59 @@
                 },
                 complete: poll
             });
+
+        }, 5000);
+    })();
+
+
+
+    (function pollLed() {
+        setTimeout(function () {
+
+
+            // LED
+            $.ajax({
+                type: 'GET',
+                dataType: 'text',
+                url: 'http://arduino.local/arduino/led/status',
+                success: function (data) {
+
+                    console.log( "LED: " + data );
+
+                    $("#led-state").removeClass(function() {
+                        return $( this ).attr( "class" );
+                    });
+
+                    if ( data == 0 ) {
+                        $("#led-state").addClass("btn btn-default");
+                        $("#led-state").html("OFF");
+                    } else {
+                        $("#led-state").addClass("btn btn-success");
+                        $("#led-state").html("ON");
+                    }
+                },
+                complete: pollLed
+            });
         }, 2000);
     })();
+
+    $('#led-state').click(function() {
+            var curr_state = $(this).html();
+
+            $("#led-state").removeClass(function() {
+                return $( this ).attr( "class" );
+            });
+
+            $("#led-state").addClass("btn btn-default");
+            $(this).html("Switching...");
+
+            if ( curr_state == 'ON' ) {
+                $.get("http://arduino.local/arduino/led/off", function() { } );
+            } else {
+                $.get("http://arduino.local/arduino/led/on", function() { } );
+            }
+    });
+
     </script>
   </body>
 </html>
